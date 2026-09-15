@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — S4ntrx Bot{% endblock %}
+{% block content %}
+<h1 class="h3 mb-1">Welcome, {{ user.name }}</h1>
+<p class="text-muted mb-4">Student ID: {{ user.student_id }} &middot; Role: {{ user.role }}</p>
+
+<div class="row g-3">
+  {% for title, desc, endpoint in [
+    ("AI Chat", "Ask S4ntrx Bot about cybersecurity concepts.", "chat.index"),
+    ("Phishing Detector", "Analyze a suspicious email, SMS, or message.", "security.phishing"),
+    ("URL Analyzer", "Check a URL's structural risk indicators.", "security.url_analyzer"),
+    ("Password Security", "Check password strength — entirely in your browser.", "security.password_security"),
+    ("Incident Report", "Report a security incident.", "incidents.list_reports"),
+  ] %}
+  <div class="col-md-6 col-lg-4">
+    <a href="{{ url_for(endpoint) }}" class="text-decoration-none text-reset">
+      <div class="card cg-card h-100">
+        <div class="card-body">
+          <h2 class="h5">{{ title }}</h2>
+          <p class="text-muted mb-0">{{ desc }}</p>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

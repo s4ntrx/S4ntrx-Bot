@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Phishing Detector — S4ntrx Bot{% endblock %}
+{% block content %}
+<h1 class="h4 mb-1">Phishing Detector</h1>
+<p class="text-muted mb-4">Paste a suspicious email, SMS, or message. This checks structure and wording only — it can't confirm intent, so treat results as guidance, not proof.</p>
+
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="card cg-card">
+      <div class="card-body">
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.content.label(class="form-label") }}
+            <textarea name="{{ form.content.name }}" class="form-control{{ ' is-invalid' if form.content.errors else '' }}" rows="10" placeholder="Paste the message text here...">{{ form.content.data or '' }}</textarea>
+            {% for e in form.content.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+          </div>
+          {{ form.submit(class="btn btn-cg-accent") }}
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    {% if result %}
+    <div class="card cg-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="badge fs-6 {{ {
+            'LOW': 'bg-success', 'MEDIUM': 'bg-warning text-dark',
+            'HIGH': 'bg-danger', 'CRITICAL': 'bg-dark'
+          }[result.risk_level] }}">{{ result.risk_level }}</span>
+          <span class="text-muted small">{{ result.indicator_count }} indicator(s) found</span>
+        </div>
+
+        <h2 class="h6">What I Found</h2>
+        {% if result.indicators %}
+          <ul>{% for i in result.indicators %}<li>{{ i }}</li>{% endfor %}</ul>
+        {% else %}
+          <p class="text-muted">No specific indicators matched.</p>
+        {% endif %}
+
+        <h2 class="h6">Why It Matters</h2>
+        <p>{{ result.explanation }}</p>
+
+        <h2 class="h6">What You Should Do</h2>
+        <p class="mb-0">{{ result.recommendation }}</p>
+      </div>
+    </div>
+    {% else %}
+      <p class="text-muted">Results will appear here after you submit a message.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

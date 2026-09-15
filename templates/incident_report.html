@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Report Incident — S4ntrx Bot{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Report a Security Incident</h1>
+
+<div class="card cg-card" style="max-width: 700px;">
+  <div class="card-body">
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="mb-3">
+        {{ form.incident_type.label(class="form-label") }}
+        <select name="{{ form.incident_type.name }}" class="form-select">
+          {% for opt in ["Phishing", "Account Compromise", "Suspicious Login", "Malware Suspicion",
+                         "Ransomware", "Lost Device", "Stolen Credentials", "Suspicious Download",
+                         "Data Exposure", "Other"] %}
+            <option value="{{ opt }}" {{ "selected" if form.incident_type.data == opt }}>{{ opt }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        <textarea name="{{ form.description.name }}" class="form-control{{ ' is-invalid' if form.description.errors else '' }}" rows="4" required>{{ form.description.data or '' }}</textarea>
+        {% for e in form.description.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          {{ form.incident_datetime.label(class="form-label") }}
+          {{ form.incident_datetime(class="form-control", placeholder="e.g. 2026-09-15 14:30") }}
+        </div>
+        <div class="col-md-6 mb-3">
+          {{ form.severity.label(class="form-label") }}
+          <select name="{{ form.severity.name }}" class="form-select">
+            {% for opt in ["low", "medium", "high", "critical"] %}
+              <option value="{{ opt }}" {{ "selected" if form.severity.data == opt }}>{{ opt|capitalize }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        {{ form.affected_asset.label(class="form-label") }}
+        {{ form.affected_asset(class="form-control", placeholder="e.g. school email account, personal laptop") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.suspected_threat.label(class="form-label") }}
+        {{ form.suspected_threat(class="form-control", placeholder="Optional") }}
+      </div>
+
+      <div class="mb-3">
+        {{ form.actions_taken.label(class="form-label") }}
+        <textarea name="{{ form.actions_taken.name }}" class="form-control" rows="2">{{ form.actions_taken.data or '' }}</textarea>
+      </div>
+
+      <div class="mb-4">
+        {{ form.additional_notes.label(class="form-label") }}
+        <textarea name="{{ form.additional_notes.name }}" class="form-control" rows="2">{{ form.additional_notes.data or '' }}</textarea>
+      </div>
+
+      {{ form.submit(class="btn btn-cg-accent") }}
+    </form>
+  </div>
+</div>
+{% endblock %}

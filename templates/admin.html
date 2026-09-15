@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Admin — S4ntrx Bot{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Admin Dashboard</h1>
+
+<div class="row g-3 mb-5">
+  {% for label, value in [
+    ("Total Students", stats.total_students),
+    ("Total Conversations", stats.total_conversations),
+    ("Security Reports", stats.security_reports),
+    ("Phishing Analyses", stats.phishing_analyses),
+    ("URL Analyses", stats.url_analyses),
+    ("High-Risk Events", stats.high_risk_events),
+  ] %}
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card cg-card text-center">
+      <div class="card-body">
+        <div class="h3 mb-0">{{ value }}</div>
+        <div class="small text-muted">{{ label }}</div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<h2 class="h5 mb-3">Recent Incident Reports</h2>
+{% if recent_reports %}
+<div class="table-responsive">
+  <table class="table cg-card align-middle">
+    <thead><tr><th>Student</th><th>Type</th><th>Severity</th><th>Status</th><th>Submitted</th></tr></thead>
+    <tbody>
+      {% for r in recent_reports %}
+      <tr>
+        <td>{{ r.user.name }}</td>
+        <td>{{ r.incident_type }}</td>
+        <td><span class="badge {{ {
+          'low': 'bg-success', 'medium': 'bg-warning text-dark',
+          'high': 'bg-danger', 'critical': 'bg-dark'
+        }[r.severity] }}">{{ r.severity|capitalize }}</span></td>
+        <td>{{ r.status|capitalize }}</td>
+        <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<p class="text-muted">No reports yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Chat — S4ntrx Bot{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h2 class="h6 mb-0">Conversations</h2>
+      <button id="newChatBtn" class="btn btn-sm btn-cg-accent">New</button>
+    </div>
+    <div class="list-group" id="sessionList">
+      {% for s in sessions %}
+        <a href="{{ url_for('chat.view_session', session_id=s.id) }}"
+           class="list-group-item list-group-item-action {{ 'active' if active_session and s.id == active_session.id }}">
+          {{ s.title }}
+        </a>
+      {% else %}
+        <p class="text-muted small">No conversations yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <div class="card cg-card">
+      <div class="card-body d-flex flex-column" style="min-height: 60vh;">
+        <div id="messageThread" class="flex-grow-1 mb-3" style="overflow-y: auto; max-height: 55vh;">
+          {% if active_session %}
+            {% for m in active_session.messages %}
+              <div class="mb-3 {{ 'text-end' if m.sender == 'user' }}">
+                <div class="d-inline-block px-3 py-2 rounded-3 {{ 'bg-primary text-white' if m.sender == 'user' else 'bg-light' }}" style="max-width: 80%; white-space: pre-wrap; text-align: left;">
+                  {{ m.message }}
+                </div>
+                <div class="small text-muted">{{ m.created_at.strftime('%H:%M') }}</div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-muted">Start a new conversation and ask about phishing, malware, passwords, MFA, or anything else on the topics list.</p>
+          {% endif %}
+        </div>
+        <div id="chatError" class="alert alert-danger d-none"></div>
+        <form id="chatForm" class="d-flex gap-2">
+          <input type="text" id="messageInput" class="form-control" placeholder="Ask S4ntrx Bot a cybersecurity question..." maxlength="2000" required>
+          <button type="submit" class="btn btn-cg-accent" id="sendBtn">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+let activeSessionId = {{ active_session.id if active_session else 'null' }};
+
+async function apiPost(url, body) {
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || 'Request failed.');
+  }
+  return res.json();
+}
+
+function appendMessage(sender, text) {
+  const thread = document.getElementById('messageThread');
+  const wrap = document.createElement('div');
+  wrap.className = 'mb-3' + (sender === 'user' ? ' text-end' : '');
+  const bubble = document.createElement('div');
+  bubble.className = 'd-inline-block px-3 py-2 rounded-3 ' + (sender === 'user' ? 'bg-primary text-white' : 'bg-light');
+  bubble.style.maxWidth = '80%';
+  bubble.style.whiteSpace = 'pre-wrap';
+  bubble.style.textAlign = 'left';
+  bubble.textContent = text;
+  wrap.appendChild(bubble);
+  thread.appendChild(wrap);
+  thread.scrollTop = thread.scrollHeight;
+}
+
+document.getElementById('newChatBtn').addEventListener('click', async () => {
+  const data = await apiPost('{{ url_for("chat.new_session") }}');
+  window.location.href = '/chat/' + data.session_id;
+});
+
+document.getElementById('chatForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('messageInput');
+  const errorBox = document.getElementById('chatError');
+  const sendBtn = document.getElementById('sendBtn');
+  const text = input.value.trim();
+  if (!text) return;
+
+  errorBox.classList.add('d-none');
+  sendBtn.disabled = true;
+  sendBtn.textContent = 'Sending...';
+
+  try {
+    if (!activeSessionId) {
+      const created = await apiPost('{{ url_for("chat.new_session") }}');
+      activeSessionId = created.session_id;
+    }
+    appendMessage('user', text);
+    input.value = '';
+
+    const data = await apiPost(`/chat/${activeSessionId}/message`, { message: text });
+    appendMessage('bot', data.bot_message.message);
+  } catch (err) {
+    errorBox.textContent = err.message;
+    errorBox.classList.remove('d-none');
+  } finally {
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Send';
+  }
+});
+</script>
+{% endblock %}
