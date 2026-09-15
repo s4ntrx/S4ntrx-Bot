@@ -12,7 +12,7 @@ Ollama is documented below but is not required.
 
 ---
 
-## 1. What's actually built (be precise about scope)
+## 1. What's actually built (scope)
 
 | Feature | Status |
 |---|---|
@@ -219,3 +219,6 @@ for hosted deployments unless you're self-hosting the whole stack.
   Enabling Ollama (see above) upgrades this if you have time.
 - **Admin promotion is CLI-only** — there's no in-app "make this user an admin" button.
 - **No charts library wired up yet** on the admin dashboard — stats are shown as numbers, not graphs.
+
+
+<img src="dashboard.png" alt="Dashboard" width="800">
