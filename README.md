@@ -222,3 +222,82 @@ for hosted deployments unless you're self-hosting the whole stack.
 
 
 <img src="dashboard.png" alt="Dashboard" width="800">
+
+## Windows Setup (PowerShell)
+
+These steps assume the project folder is **not** inside OneDrive-synced
+folders (Desktop/Documents inside OneDrive can cause file-permission
+errors on `.env`). If possible, keep the project under `C:\` directly,
+e.g. `C:\s4ntrx-bot`.
+
+### 1. Open PowerShell in the project folder
+Open the extracted project folder in File Explorer, click the address
+bar, type `powershell`, press Enter.
+
+### 2. Check Python is installed
+```powershell
+python --version
+```
+Requires 3.10 or higher. If not installed, get it from python.org and
+check "Add Python to PATH" during install.
+
+### 3. Create and activate a virtual environment
+```powershell
+python -m venv .venv
+.venv\Scripts\activate
+```
+Your prompt should now start with `(.venv)`. If activation is blocked
+by a script-execution error, run once:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+### 4. Install dependencies
+```powershell
+pip install -r requirements.txt
+```
+
+### 5. Create your `.env` file
+```powershell
+copy .env.example .env
+```
+Generate a secret key and write it directly into `.env` in one step:
+```powershell
+$key = python -c "import secrets; print(secrets.token_hex(32))"
+(Get-Content .env.example) -replace '^SECRET_KEY=$', "SECRET_KEY=$key" | Set-Content .env
+Get-Content .env
+```
+Confirm the last command shows a real key after `SECRET_KEY=`.
+
+**If you get "Access to the path '.env' is denied"** (a known Windows
+issue, unrelated to this project — can be OneDrive file locking,
+antivirus, or a corrupted file ACL), use Python to write the file
+instead, which sidesteps it:
+```powershell
+Remove-Item .env -Force -ErrorAction SilentlyContinue
+python -c "
+import secrets
+content = open('.env.example').read()
+content = content.replace('SECRET_KEY=', 'SECRET_KEY=' + secrets.token_hex(32))
+open('.env', 'w').write(content)
+"
+Get-Content .env
+```
+
+### 6. Run the app
+```powershell
+python app.py
+```
+Open `http://127.0.0.1:5000` in a browser. The SQLite database is
+created automatically on first run at `instance\s4ntrx.db`.
+
+### 7. Create an admin account
+In a **second** PowerShell window, in the same folder, with the venv
+activated (`.venv\Scripts\activate`):
+```powershell
+flask --app app seed-admin
+```
+Follow the prompts to promote an existing account or create a new admin.
+
+### 8. Stop the server
+In the terminal running `python app.py`, press `Ctrl+C`.
