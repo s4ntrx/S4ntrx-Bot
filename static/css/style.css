@@ -1,0 +1,244 @@
+:root {
+  --cg-navy: #0f172a;
+  --cg-navy-light: #1e293b;
+  --cg-accent: #0ea5e9;
+  --cg-accent-dark: #0284c7;
+  --cg-accent-soft: #e0f2fe;
+  --cg-text-muted: #64748b;
+  --cg-border: #e2e8f0;
+  --cg-radius: 10px;
+  --cg-radius-lg: 14px;
+  --cg-danger: #dc2626;
+  --cg-warning: #d97706;
+  --cg-success: #16a34a;
+  --cg-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 1px 1px rgba(15, 23, 42, 0.03);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background-color: #f8fafc;
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+}
+
+/* ---------- Navbar ---------- */
+.cg-navbar {
+  background-color: var(--cg-navy);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.cg-navbar .nav-link {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.cg-navbar .nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.cg-navbar .nav-link.active,
+.cg-navbar .navbar-brand {
+  color: #fff;
+}
+
+.cg-navbar .nav-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 4px;
+  vertical-align: -3px;
+}
+
+/* ---------- Buttons ---------- */
+.btn-cg-accent {
+  background-color: var(--cg-accent);
+  border-color: var(--cg-accent);
+  color: #fff;
+  border-radius: var(--cg-radius);
+  font-weight: 500;
+}
+
+.btn-cg-accent:hover,
+.btn-cg-accent:focus {
+  background-color: var(--cg-accent-dark);
+  border-color: var(--cg-accent-dark);
+  color: #fff;
+}
+
+.btn-cg-accent:disabled {
+  opacity: 0.6;
+}
+
+/* ---------- Cards ---------- */
+.cg-card {
+  border: 1px solid var(--cg-border);
+  border-radius: var(--cg-radius-lg);
+  box-shadow: var(--cg-shadow);
+  background: #fff;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+a.cg-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+a.cg-card-link .cg-card:hover {
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+  border-color: #cbd5e1;
+}
+
+/* ---------- Feature icons (dashboard tiles) ---------- */
+.cg-feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--cg-accent-soft);
+  color: var(--cg-accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.cg-feature-icon svg { width: 20px; height: 20px; }
+
+/* ---------- Hero ---------- */
+.cg-hero h1 { color: var(--cg-navy); }
+
+.cg-hero-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--cg-navy);
+  color: var(--cg-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Forms ---------- */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--cg-accent);
+  box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.15);
+}
+
+/* ---------- Risk / severity badges (shared across tools) ---------- */
+.cg-badge-low { background: #dcfce7; color: #166534; }
+.cg-badge-medium { background: #fef9c3; color: #854d0e; }
+.cg-badge-high { background: #fee2e2; color: #991b1b; }
+.cg-badge-critical { background: #1e293b; color: #fff; }
+
+/* ---------- Chat ---------- */
+.cg-chat-thread {
+  overflow-y: auto;
+  max-height: 60vh;
+  padding-right: 4px;
+}
+
+.cg-msg-row { display: flex; gap: 8px; margin-bottom: 1rem; align-items: flex-start; }
+.cg-msg-row.cg-msg-user { flex-direction: row-reverse; }
+
+.cg-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.cg-avatar-bot { background: var(--cg-navy); }
+.cg-avatar-user { background: var(--cg-accent); }
+
+.cg-bubble {
+  max-width: 78%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 14px;
+  line-height: 1.55;
+  font-size: 0.93rem;
+}
+
+.cg-bubble p:last-child { margin-bottom: 0; }
+.cg-bubble ul, .cg-bubble ol { padding-left: 1.1rem; margin-bottom: 0.4rem; }
+.cg-bubble h2, .cg-bubble h3 { font-size: 0.95rem; font-weight: 600; margin: 0.5rem 0 0.25rem; }
+
+.cg-bubble-bot { background: #f1f5f9; color: #1e293b; border-top-left-radius: 4px; }
+.cg-bubble-user { background: var(--cg-accent); color: #fff; border-top-right-radius: 4px; }
+
+.cg-msg-time { font-size: 0.72rem; color: var(--cg-text-muted); margin-top: 2px; }
+
+.cg-typing {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+}
+
+.cg-typing span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #94a3b8;
+  animation: cg-typing-bounce 1.2s infinite ease-in-out;
+}
+.cg-typing span:nth-child(2) { animation-delay: 0.15s; }
+.cg-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes cg-typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.cg-session-list .list-group-item {
+  border-radius: 8px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+  font-size: 0.88rem;
+}
+.cg-session-list .list-group-item.active {
+  background: var(--cg-accent-soft);
+  color: var(--cg-navy);
+  border-color: var(--cg-accent);
+  font-weight: 500;
+}
+
+/* ---------- Tables ---------- */
+.cg-table thead th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cg-text-muted);
+  border-bottom: 1px solid var(--cg-border);
+}
+
+/* ---------- Stat tiles (admin) ---------- */
+.cg-stat {
+  text-align: center;
+  padding: 1rem 0.5rem;
+}
+.cg-stat .cg-stat-value { font-size: 1.6rem; font-weight: 600; color: var(--cg-navy); }
+.cg-stat .cg-stat-label { font-size: 0.78rem; color: var(--cg-text-muted); }
+
+/* ---------- Empty states ---------- */
+.cg-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--cg-text-muted);
+}
+.cg-empty svg { width: 40px; height: 40px; margin-bottom: 0.75rem; opacity: 0.5; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 767.98px) {
+  .cg-chat-thread { max-height: 50vh; }
+  .cg-bubble { max-width: 88%; }
+}

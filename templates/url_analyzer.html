@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}URL Analyzer — S4ntrx Bot{% endblock %}
+{% block content %}
+<h1 class="h4 mb-1">URL Analyzer</h1>
+<p class="text-muted mb-4">Checks a URL's structure for common phishing red flags. No live threat-intelligence service is connected — this can flag a URL as "suspicious," never confirm it as "malicious."</p>
+
+<div class="card cg-card mb-4" style="max-width: 600px;">
+  <div class="card-body">
+    <form method="POST" class="d-flex gap-2" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="flex-grow-1">
+        {{ form.url(class="form-control" + (" is-invalid" if form.url.errors else ""), placeholder="https://example.com/...") }}
+        {% for e in form.url.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+      </div>
+      {{ form.submit(class="btn btn-cg-accent") }}
+    </form>
+  </div>
+</div>
+
+{% if result %}
+<div class="card cg-card" style="max-width: 700px;">
+  <div class="card-body">
+    <p class="text-muted small text-break mb-2">{{ result.url }}</p>
+    <div class="d-flex align-items-center gap-2 mb-3">
+      <span class="badge {{ 'cg-badge-' ~ result.risk_level|lower }} px-3 py-2">{{ result.risk_level }}</span>
+      <span class="text-muted small">{{ result.indicator_count }} indicator(s) found</span>
+    </div>
+
+    <h2 class="h6">What I Found</h2>
+    {% if result.indicators %}
+      <ul>{% for i in result.indicators %}<li>{{ i }}</li>{% endfor %}</ul>
+    {% else %}
+      <p class="text-muted">No structural red flags matched.</p>
+    {% endif %}
+
+    <h2 class="h6">Why It Matters</h2>
+    <p>{{ result.explanation }}</p>
+
+    <h2 class="h6">What You Should Do</h2>
+    <p class="mb-0">{{ result.recommendation }}</p>
+  </div>
+</div>
+{% else %}
+<div class="cg-empty" style="max-width: 700px;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.49-1.49"/></svg>
+  <p class="mb-0">Enter a URL above to check it.</p>
+</div>
+{% endif %}
+{% endblock %}
