@@ -54,20 +54,14 @@ function analyzePassword(pw) {
 
   score = Math.max(0, Math.min(score, 7));
 
-  let rating, ratingClass;
-  if (pw.length === 0) {
-    rating = "—"; ratingClass = "secondary";
-  } else if (score <= 2) {
-    rating = "Weak"; ratingClass = "danger";
-  } else if (score <= 4) {
-    rating = "Fair"; ratingClass = "warning";
-  } else if (score <= 6) {
-    rating = "Strong"; ratingClass = "info";
-  } else {
-    rating = "Very Strong"; ratingClass = "success";
-  }
+  let rating, level;
+  if (pw.length === 0) { rating = "—"; level = 0; }
+  else if (score <= 2) { rating = "Weak"; level = 1; }
+  else if (score <= 4) { rating = "Fair"; level = 2; }
+  else if (score <= 6) { rating = "Strong"; level = 3; }
+  else { rating = "Very strong"; level = 4; }
 
-  return { rating, ratingClass, score, maxScore: 7, weaknesses };
+  return { rating, level, score, maxScore: 7, weaknesses };
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -77,26 +71,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const ratingLabel = document.getElementById("pwRating");
   const weaknessList = document.getElementById("pwWeaknesses");
 
+  const addNote = (text, ok) => {
+    const li = document.createElement("li");
+    li.innerHTML = '<svg class="i"><use href="' + (ok ? "#i-check" : "#i-alert") + '"/></svg>';
+    const span = document.createElement("span");
+    span.textContent = text;
+    li.appendChild(span);
+    weaknessList.appendChild(li);
+  };
+
   input.addEventListener("input", () => {
     const result = analyzePassword(input.value);
-    const pct = Math.round((result.score / result.maxScore) * 100);
-    bar.style.width = pct + "%";
-    bar.className = "progress-bar bg-" + result.ratingClass;
+    bar.dataset.level = result.level;
     ratingLabel.textContent = result.rating;
-    ratingLabel.className = "badge bg-" + result.ratingClass;
-
+    weaknessList.className = "flags";
     weaknessList.innerHTML = "";
     if (input.value.length > 0 && result.weaknesses.length === 0) {
-      const li = document.createElement("li");
-      li.className = "text-success";
-      li.textContent = "No common weaknesses detected.";
-      weaknessList.appendChild(li);
+      weaknessList.className = "flags ok";
+      addNote("No common weaknesses detected.", true);
     } else {
-      result.weaknesses.forEach((w) => {
-        const li = document.createElement("li");
-        li.textContent = w;
-        weaknessList.appendChild(li);
-      });
+      result.weaknesses.forEach((w) => addNote(w, false));
     }
   });
 

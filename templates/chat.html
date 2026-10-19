@@ -1,67 +1,66 @@
 {% extends "base.html" %}
 {% block title %}Chat — S4ntrx Bot{% endblock %}
+{% block page_class %}wide{% endblock %}
 {% block content %}
-<div class="row g-3">
-  <div class="col-md-3">
-    <div class="d-flex justify-content-between align-items-center mb-2">
-      <h2 class="h6 mb-0">Conversations</h2>
-      <button id="newChatBtn" class="btn btn-sm btn-cg-accent">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        New
-      </button>
+<div class="chat">
+  <aside class="rail" aria-label="Conversations">
+    <div class="rail-head">
+      <h2>Conversations</h2>
+      <button type="button" id="newChatBtn" class="btn btn-icon" aria-label="New conversation"><svg class="i"><use href="#i-plus"/></svg></button>
     </div>
-    <div class="list-group cg-session-list" id="sessionList">
+    <div class="sessions" id="sessionList">
       {% for s in sessions %}
-        <div class="d-flex align-items-stretch">
-          <a href="{{ url_for('chat.view_session', session_id=s.id) }}"
-             class="list-group-item list-group-item-action flex-grow-1 text-truncate {{ 'active' if active_session and s.id == active_session.id }}">
-            {{ s.title }}
-          </a>
-          <button type="button" class="btn btn-sm btn-link text-danger cg-session-delete" data-session-id="{{ s.id }}" title="Delete conversation" aria-label="Delete conversation">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-          </button>
-        </div>
+      <div class="session {{ 'active' if active_session and s.id == active_session.id }}">
+        <a href="{{ url_for('chat.view_session', session_id=s.id) }}" title="{{ s.title }}">{{ s.title }}</a>
+        <button type="button" class="btn btn-icon btn-danger cg-session-delete" data-session-id="{{ s.id }}" aria-label="Delete conversation" style="border:0;background:none;width:28px;height:28px"><svg class="i" style="width:15px;height:15px"><use href="#i-trash"/></svg></button>
+      </div>
       {% else %}
-        <p class="text-muted small">No conversations yet.</p>
+      <p class="muted" style="font-size:.85rem;padding:.4rem .6rem">No conversations yet.</p>
       {% endfor %}
     </div>
-  </div>
+  </aside>
 
-  <div class="col-md-9">
-    <div class="card cg-card">
-      <div class="card-body d-flex flex-column" style="min-height: 62vh;">
-        <div id="messageThread" class="cg-chat-thread flex-grow-1 mb-3">
-          {% if active_session and active_session.messages %}
-            {% for m in active_session.messages %}
-              <div class="cg-msg-row {{ 'cg-msg-user' if m.sender == 'user' }}">
-                <div class="cg-avatar {{ 'cg-avatar-user' if m.sender == 'user' else 'cg-avatar-bot' }}">{{ (current_user.name[0]|upper) if m.sender == 'user' else 'S' }}</div>
-                <div>
-                  <div class="cg-bubble {{ 'cg-bubble-user' if m.sender == 'user' else 'cg-bubble-bot' }} cg-md">{{ m.message }}</div>
-                  <div class="cg-msg-time {{ 'text-end' if m.sender == 'user' }}">{{ m.created_at.strftime('%H:%M') }}</div>
-                </div>
-              </div>
-            {% endfor %}
-          {% else %}
-            <div class="cg-empty">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.4 8.4 0 0 1-8.9 8.4 9 9 0 0 1-3.6-.8L3 21l1.9-5.5A8.4 8.4 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/></svg>
-              <p class="mb-0">Ask S4ntrx Bot about phishing, malware, passwords, MFA, or safe browsing to get started.</p>
-            </div>
-          {% endif %}
+  <section class="panel" aria-label="Chat">
+    <div id="messageThread" class="thread" role="log" aria-live="polite">
+      {% if active_session and active_session.messages %}
+        {% for m in active_session.messages %}
+        <div class="msg {{ 'user' if m.sender == 'user' else 'bot' }}">
+          <div class="bubble {{ 'md' if m.sender != 'user' }}">{{ m.message }}</div>
+          <time>{{ m.created_at.strftime('%H:%M') }}</time>
         </div>
-        <div id="chatError" class="alert alert-danger py-2 d-none"></div>
-        <form id="chatForm" class="d-flex gap-2">
-          <input type="text" id="messageInput" class="form-control" placeholder="Ask S4ntrx Bot a cybersecurity question..." maxlength="2000" required autocomplete="off">
-          <button type="submit" class="btn btn-cg-accent" id="sendBtn">Send</button>
-        </form>
-      </div>
+        {% endfor %}
+      {% else %}
+        <div class="starter" id="starter">
+          <div class="tile-icon"><svg class="i"><use href="#i-shield"/></svg></div>
+          <h2>What do you want to learn?</h2>
+          <p class="muted">Ask about phishing, malware, passwords, MFA, or safe browsing.</p>
+          <div class="prompts">
+            <button type="button" class="btn" data-prompt="How do I spot a phishing email?">Spot phishing</button>
+            <button type="button" class="btn" data-prompt="What is multi-factor authentication?">What is MFA?</button>
+            <button type="button" class="btn" data-prompt="How does ransomware work?">How ransomware works</button>
+            <button type="button" class="btn" data-prompt="How do I create a strong password?">Strong passwords</button>
+          </div>
+        </div>
+      {% endif %}
     </div>
-  </div>
+    <div class="composer">
+      <p id="chatError" class="error" hidden></p>
+      <form id="chatForm">
+        <input type="text" id="messageInput" class="input" placeholder="Ask a cybersecurity question..." maxlength="2000" required autocomplete="off" aria-label="Message">
+        <button type="submit" class="btn btn-primary" id="sendBtn"><span>Send</span><svg class="i"><use href="#i-send"/></svg></button>
+      </form>
+    </div>
+  </section>
 </div>
 
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-const currentUserInitial = {{ (current_user.name[0]|upper)|tojson }};
+const userInitial = {{ (current_user.name[0]|upper)|tojson }};
 let activeSessionId = {{ active_session.id if active_session else 'null' }};
+const thread = document.getElementById('messageThread');
+const input = document.getElementById('messageInput');
+const errorBox = document.getElementById('chatError');
+const sendBtn = document.getElementById('sendBtn');
 
 async function apiPost(url, body) {
   const res = await fetch(url, {
@@ -76,110 +75,53 @@ async function apiPost(url, body) {
   return res.json();
 }
 
-// Minimal markdown-ish renderer for bot replies: headers, bold, bullet
-// lists, and paragraphs. Escapes HTML first so nothing can inject markup.
+// Minimal markdown renderer: ## headings, **bold**, "- " lists, paragraphs.
+// HTML is escaped first, so nothing in a message can inject markup.
 function renderMarkdownLite(text) {
-  const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const lines = escape(text).split('\n');
-  let html = '';
-  let inList = false;
-  for (const raw of lines) {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  let html = '', inList = false;
+  const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+  for (const raw of esc(text).split('\n')) {
     const line = raw.trim();
-    if (/^##\s+/.test(line)) {
-      if (inList) { html += '</ul>'; inList = false; }
-      html += `<h3>${line.replace(/^##\s+/, '')}</h3>`;
-    } else if (/^-\s+/.test(line)) {
-      if (!inList) { html += '<ul>'; inList = true; }
-      html += `<li>${line.replace(/^-\s+/, '')}</li>`;
-    } else if (line === '') {
-      if (inList) { html += '</ul>'; inList = false; }
-    } else {
-      if (inList) { html += '</ul>'; inList = false; }
-      const bolded = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-      html += `<p>${bolded}</p>`;
-    }
+    if (/^##\s+/.test(line)) { closeList(); html += `<h3>${line.replace(/^##\s+/, '')}</h3>`; }
+    else if (/^-\s+/.test(line)) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${line.replace(/^-\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`; }
+    else if (line === '') closeList();
+    else { closeList(); html += `<p>${line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`; }
   }
-  if (inList) html += '</ul>';
-  return html || `<p>${escape(text)}</p>`;
-}
-
-function clearEmptyState() {
-  const empty = document.querySelector('#messageThread .cg-empty');
-  if (empty) empty.remove();
+  closeList();
+  return html || `<p>${esc(text)}</p>`;
 }
 
 function appendMessage(sender, text) {
-  clearEmptyState();
-  const thread = document.getElementById('messageThread');
-  const row = document.createElement('div');
-  row.className = 'cg-msg-row' + (sender === 'user' ? ' cg-msg-user' : '');
-
-  const avatar = document.createElement('div');
-  avatar.className = 'cg-avatar ' + (sender === 'user' ? 'cg-avatar-user' : 'cg-avatar-bot');
-  avatar.textContent = sender === 'user' ? currentUserInitial : 'S';
-
-  const col = document.createElement('div');
+  document.getElementById('starter')?.remove();
+  const msg = document.createElement('div');
+  msg.className = 'msg ' + (sender === 'user' ? 'user' : 'bot');
   const bubble = document.createElement('div');
-  bubble.className = 'cg-bubble cg-md ' + (sender === 'user' ? 'cg-bubble-user' : 'cg-bubble-bot');
-  bubble.innerHTML = renderMarkdownLite(text);
-
-  const time = document.createElement('div');
-  time.className = 'cg-msg-time' + (sender === 'user' ? ' text-end' : '');
+  bubble.className = 'bubble';
+  if (sender === 'user') bubble.textContent = text; else bubble.innerHTML = renderMarkdownLite(text);
+  const time = document.createElement('time');
   time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-  col.appendChild(bubble);
-  col.appendChild(time);
-  row.appendChild(avatar);
-  row.appendChild(col);
-  thread.appendChild(row);
+  msg.append(bubble, time);
+  thread.appendChild(msg);
   thread.scrollTop = thread.scrollHeight;
-  return row;
 }
 
-function showTypingIndicator() {
-  const thread = document.getElementById('messageThread');
+function setTyping(on) {
+  document.getElementById('typingRow')?.remove();
+  if (!on) return;
   const row = document.createElement('div');
-  row.className = 'cg-msg-row';
   row.id = 'typingRow';
-  row.innerHTML = `
-    <div class="cg-avatar cg-avatar-bot">S</div>
-    <div class="cg-bubble cg-bubble-bot cg-typing"><span></span><span></span><span></span></div>
-  `;
+  row.className = 'msg bot';
+  row.innerHTML = '<div class="bubble typing" aria-label="S4ntrx Bot is typing"><span></span><span></span><span></span></div>';
   thread.appendChild(row);
   thread.scrollTop = thread.scrollHeight;
 }
 
-function hideTypingIndicator() {
-  const row = document.getElementById('typingRow');
-  if (row) row.remove();
-}
-
-document.getElementById('newChatBtn').addEventListener('click', async () => {
-  const data = await apiPost('{{ url_for("chat.new_session") }}');
-  window.location.href = '/chat/' + data.session_id;
-});
-
-document.querySelectorAll('.cg-session-delete').forEach((btn) => {
-  btn.addEventListener('click', async (e) => {
-    e.preventDefault();
-    const id = btn.dataset.sessionId;
-    if (!confirm('Delete this conversation? This cannot be undone.')) return;
-    await apiPost(`/chat/${id}/delete`);
-    window.location.href = '{{ url_for("chat.index") }}';
-  });
-});
-
-document.getElementById('chatForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const input = document.getElementById('messageInput');
-  const errorBox = document.getElementById('chatError');
-  const sendBtn = document.getElementById('sendBtn');
-  const text = input.value.trim();
+async function sendMessage(text) {
+  text = text.trim();
   if (!text) return;
-
-  errorBox.classList.add('d-none');
+  errorBox.hidden = true;
   sendBtn.disabled = true;
-
   try {
     if (!activeSessionId) {
       const created = await apiPost('{{ url_for("chat.new_session") }}');
@@ -187,18 +129,37 @@ document.getElementById('chatForm').addEventListener('submit', async (e) => {
     }
     appendMessage('user', text);
     input.value = '';
-    showTypingIndicator();
-
+    setTyping(true);
     const data = await apiPost(`/chat/${activeSessionId}/message`, { message: text });
-    hideTypingIndicator();
+    setTyping(false);
     appendMessage('bot', data.bot_message.message);
   } catch (err) {
-    hideTypingIndicator();
+    setTyping(false);
     errorBox.textContent = err.message;
-    errorBox.classList.remove('d-none');
+    errorBox.hidden = false;
   } finally {
     sendBtn.disabled = false;
+    input.focus();
   }
+}
+
+document.querySelectorAll('.bubble.md').forEach((el) => { el.innerHTML = renderMarkdownLite(el.textContent); });
+thread.scrollTop = thread.scrollHeight;
+
+document.getElementById('chatForm').addEventListener('submit', (e) => { e.preventDefault(); sendMessage(input.value); });
+document.querySelectorAll('[data-prompt]').forEach((b) => b.addEventListener('click', () => sendMessage(b.dataset.prompt)));
+
+document.getElementById('newChatBtn').addEventListener('click', async () => {
+  const data = await apiPost('{{ url_for("chat.new_session") }}');
+  window.location.href = '/chat/' + data.session_id;
+});
+
+document.querySelectorAll('.cg-session-delete').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    if (!confirm('Delete this conversation? This cannot be undone.')) return;
+    await apiPost(`/chat/${btn.dataset.sessionId}/delete`);
+    window.location.href = '{{ url_for("chat.index") }}';
+  });
 });
 </script>
 {% endblock %}

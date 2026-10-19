@@ -1,49 +1,44 @@
 {% extends "base.html" %}
 {% block title %}URL Analyzer — S4ntrx Bot{% endblock %}
 {% block content %}
-<h1 class="h4 mb-1">URL Analyzer</h1>
-<p class="text-muted mb-4">Checks a URL's structure for common phishing red flags. No live threat-intelligence service is connected — this can flag a URL as "suspicious," never confirm it as "malicious."</p>
-
-<div class="card cg-card mb-4" style="max-width: 600px;">
-  <div class="card-body">
-    <form method="POST" class="d-flex gap-2" novalidate>
-      {{ form.hidden_tag() }}
-      <div class="flex-grow-1">
-        {{ form.url(class="form-control" + (" is-invalid" if form.url.errors else ""), placeholder="https://example.com/...") }}
-        {% for e in form.url.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
-      </div>
-      {{ form.submit(class="btn btn-cg-accent") }}
-    </form>
-  </div>
+<div class="page-head">
+  <span class="eyebrow">Tool</span>
+  <h1>URL Analyzer</h1>
+  <p>Checks a URL’s structure for common phishing red flags. No live threat-intelligence service is connected, so this can flag a URL as “suspicious,” never confirm it as “malicious.”</p>
 </div>
+<form method="POST" class="card" novalidate style="margin-bottom:1.25rem">
+  {{ form.hidden_tag() }}
+  <div class="inline" style="align-items:flex-start">
+    <div class="field">
+      <label for="{{ form.url.id }}" class="sr">URL</label>
+      {{ form.url(class="input" + (" invalid" if form.url.errors else ""), placeholder="https://example.com/...") }}
+      {% for e in form.url.errors %}<span class="error">{{ e }}</span>{% endfor %}
+    </div>
+    {{ form.submit(class="btn btn-primary") }}
+  </div>
+</form>
 
 {% if result %}
-<div class="card cg-card" style="max-width: 700px;">
-  <div class="card-body">
-    <p class="text-muted small text-break mb-2">{{ result.url }}</p>
-    <div class="d-flex align-items-center gap-2 mb-3">
-      <span class="badge {{ 'cg-badge-' ~ result.risk_level|lower }} px-3 py-2">{{ result.risk_level }}</span>
-      <span class="text-muted small">{{ result.indicator_count }} indicator(s) found</span>
-    </div>
-
-    <h2 class="h6">What I Found</h2>
-    {% if result.indicators %}
-      <ul>{% for i in result.indicators %}<li>{{ i }}</li>{% endfor %}</ul>
-    {% else %}
-      <p class="text-muted">No structural red flags matched.</p>
-    {% endif %}
-
-    <h2 class="h6">Why It Matters</h2>
-    <p>{{ result.explanation }}</p>
-
-    <h2 class="h6">What You Should Do</h2>
-    <p class="mb-0">{{ result.recommendation }}</p>
+{% set lvl = result.risk_level|lower %}
+<div class="card sev-{{ lvl }}">
+  <code class="url-chip">{{ result.url }}</code>
+  <div class="result-head">
+    <div><span class="label">Risk level</span><div class="level">{{ lvl }}</div></div>
+    <span class="muted mono" style="font-size:.8rem">{{ result.indicator_count }} indicator(s)</span>
   </div>
+  <div class="meter" data-level="{{ {'low':1,'medium':2,'high':3,'critical':4}.get(lvl, 1) }}"><i></i><i></i><i></i><i></i></div>
+  <div class="section-label">What I found</div>
+  {% if result.indicators %}
+    <ul class="flags">{% for i in result.indicators %}<li><svg class="i"><use href="#i-alert"/></svg><span>{{ i }}</span></li>{% endfor %}</ul>
+  {% else %}
+    <ul class="flags ok"><li><svg class="i"><use href="#i-check"/></svg><span>No structural red flags matched.</span></li></ul>
+  {% endif %}
+  <div class="section-label">Why it matters</div>
+  <p>{{ result.explanation }}</p>
+  <div class="section-label">What you should do</div>
+  <p>{{ result.recommendation }}</p>
 </div>
 {% else %}
-<div class="cg-empty" style="max-width: 700px;">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07l1.49-1.49"/></svg>
-  <p class="mb-0">Enter a URL above to check it.</p>
-</div>
+<div class="empty"><svg class="i"><use href="#i-link"/></svg><p>Enter a URL above to check it.</p></div>
 {% endif %}
 {% endblock %}
