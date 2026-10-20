@@ -156,8 +156,10 @@ s4ntrx-bot/
 ├── knowledge/                          # Markdown knowledge base the AI draws from
 │   ├── phishing.md, malware.md, ransomware.md, passwords.md,
 │   ├── authentication.md, network_security.md, social_engineering.md,
+│   ├── safe_browsing.md, privacy.md, mobile_security.md,
 │   └── incident_response.md, cybersecurity_basics.md
-├── templates/                            # Jinja2 + Bootstrap 5
+│       (each "## Heading" is one searchable answer; keep sections under ~900 chars)
+├── templates/                            # Jinja2 + custom CSS (no Bootstrap)
 └── static/css, static/js
 ```
 
@@ -213,8 +215,8 @@ for hosted deployments unless you're self-hosting the whole stack.
 - **Phishing/URL analysis is heuristic, not threat intelligence.** No
   live blocklist or reputation service is connected — both tools say so
   in their own output.
-- **The offline AI is keyword-matching against local Markdown files**,
-  not a language model. It's accurate because it only ever returns real
+- **The offline AI is section-level keyword matching against local Markdown
+  files** (stop-word removal, light stemming, heading weighting), not a language model. It's accurate because it only ever returns real
   knowledge-base content, but it isn't as conversational as an LLM.
   Enabling Ollama (see above) upgrades this if you have time.
 - **Admin promotion is CLI-only** — there's no in-app "make this user an admin" button.
