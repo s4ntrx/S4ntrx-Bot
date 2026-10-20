@@ -90,6 +90,14 @@ Then open `http://127.0.0.1:5000`.
 The SQLite database file is created automatically on first run at
 `instance/s4ntrx.db` — no manual database setup needed for local use.
 
+### Creating an admin account
+
+```bash
+flask --app app seed-admin
+```
+
+This prompts for an email; if that email already has an account it's
+promoted to admin, otherwise it creates a new admin account interactively.
 
 ### (Optional) Enabling Ollama for a more conversational AI
 

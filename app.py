@@ -78,6 +78,8 @@ def create_app(env_name=None):
             db.session.commit()
             print(f"Admin account created for {email}.")
 
+    os.makedirs(os.path.join(os.path.dirname(os.path.abspath(__file__)), "instance"), exist_ok=True)
+
     with app.app_context():
         db.create_all()
 
