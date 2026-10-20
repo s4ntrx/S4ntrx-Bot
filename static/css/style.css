@@ -243,3 +243,6 @@ a:hover { color: var(--accent-hover); }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; } }
 .page.full { max-width: 1120px; }
+.bubble ol { padding-left: 1.2rem; }
+.bubble li + li { margin-top: 0.3rem; }
+.bubble code { padding: 0.1rem 0.35rem; border-radius: 5px; background: var(--bg); font: 0.85em var(--mono); }

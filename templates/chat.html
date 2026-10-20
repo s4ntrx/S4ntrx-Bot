@@ -75,18 +75,21 @@ async function apiPost(url, body) {
   return res.json();
 }
 
-// Minimal markdown renderer: ## headings, **bold**, "- " lists, paragraphs.
+// Minimal markdown renderer: ## headings, **bold**, `code`, "- " and "1. " lists, paragraphs.
 // HTML is escaped first, so nothing in a message can inject markup.
 function renderMarkdownLite(text) {
   const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  let html = '', inList = false;
-  const closeList = () => { if (inList) { html += '</ul>'; inList = false; } };
+  const inline = (s) => s.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`(.+?)`/g, '<code>$1</code>');
+  let html = '', list = null;
+  const closeList = () => { if (list) { html += `</${list}>`; list = null; } };
+  const openList = (tag) => { if (list !== tag) { closeList(); html += `<${tag}>`; list = tag; } };
   for (const raw of esc(text).split('\n')) {
     const line = raw.trim();
-    if (/^##\s+/.test(line)) { closeList(); html += `<h3>${line.replace(/^##\s+/, '')}</h3>`; }
-    else if (/^-\s+/.test(line)) { if (!inList) { html += '<ul>'; inList = true; } html += `<li>${line.replace(/^-\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</li>`; }
+    if (/^##\s+/.test(line)) { closeList(); html += `<h3>${inline(line.replace(/^##\s+/, ''))}</h3>`; }
+    else if (/^[-*]\s+/.test(line)) { openList('ul'); html += `<li>${inline(line.replace(/^[-*]\s+/, ''))}</li>`; }
+    else if (/^\d+\.\s+/.test(line)) { openList('ol'); html += `<li>${inline(line.replace(/^\d+\.\s+/, ''))}</li>`; }
     else if (line === '') closeList();
-    else { closeList(); html += `<p>${line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`; }
+    else { closeList(); html += `<p>${inline(line)}</p>`; }
   }
   closeList();
   return html || `<p>${esc(text)}</p>`;
